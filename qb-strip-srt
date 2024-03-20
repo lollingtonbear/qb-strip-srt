@@ -1,0 +1,142 @@
+#!/bin/bash
+
+### INFORMATION ######################################################################################################
+
+# Script Name    :  qb-strip-srt
+# Orginal Author :  Andy Sibthorp
+# Latest Author  :  Andy Sibthorp
+# Version        :  1.0
+# Date           :  19/03/2024
+
+# Dependencies:
+#   qbittorrent-nox
+#   mkvtoolnix-cli
+#   mkvtoolnix-gui
+
+# Description:
+#   This bash script uses mkvmerge to remove unwanted subtitles (SRT) from specifed mkv file. It then deletes the original mkv file and moves it to the specified target dir.
+#   This designed to work with radarr and sonarr and qbittorrent
+
+# Instructions:
+
+# 1. Prep the script
+#    Copy this script to a useful location (e.g. /usr/local/bin) and make it executable with chmod.
+#    Edit the varibles in the "Definitions and Settings" section to align with your own qbittorrent configuration.
+#    Edit the language settings if you prefer a non-English set of subtitles.
+#    Create the new target and logs directies. This script will try to do to for your if they don't exist, so it is assumed the script has permissions to do this.
+
+
+# 2. Configure qbittorrent:
+#    You will need to configure qbittorrent to run this script after a torrent has finised downloading.
+#    In the qbittorrent web client goto Options > Downloads, then scroll down to the "Run external program" section
+#    Tick "Run external program on torrent finished"
+#    Enter the following in to the box below that tick box:
+#       /<path to the script>/qb-strip-srt "%R"
+
+
+# 3. Configure radarr and sonarr
+#    You will need to configure sonar and radarr to look in the correct place the downloads
+#    Open the radarr web interface and navigate to Settings > Download client
+#    Add a new Remote Path Mapping that contains the download location Configured in qbittorrent and the location you want the script to place the files after being processed.
+#    See here for guide: https://wiki.servarr.com/radarr/settings#remote-path-mappings
+
+
+### Definitions and Settings #########################################################################################
+
+# Script settings
+strSourceDir="$1"
+
+# You can specify you preferred languages to keep in the output mkv files here.
+# Comma seperated, no spaces.
+strRequiredSubtitleTracks="und,eng"
+strRequiredAudioTracks="und,eng"
+
+# Specify Log file location and log file name
+strLogDir="/home/qbuser/qb-strip-srt-logs"
+strLogFile="$strLogDir/qb-strip-srt $(date +"%y%m%d_%H%M%S").log"
+
+# Specify the target dir
+if [[ $strSourceDir == *"radarr"* ]]
+then
+	strTargetDir="/mnt/ssd-01/Torrents/complete-postprocessed/radarr"
+elif [[ $strSourceDir == *"tv-sonarr"* ]]
+then
+	strTargetDir="/mnt/ssd-01/Torrents/complete-postprocessed/sonarr"
+else
+	strTargetDir="/mnt/ssd-01/Torrents/complete-postprocessed"
+fi
+
+# Create the target dir if doesn't already exist
+if [ ! -d "$strTargetDir" ]
+then
+	mkdir -p "$strTargetDir"
+fi
+
+
+### Process MKV files ################################################################################################
+
+# Start logging
+if [ ! -d "$strLogDir" ]
+then
+	mkdir -p "$strLogDir"
+fi
+exec > >(tee -a "$strLogFile") 2>&1
+
+
+# Announce the source dir and filename
+echo "Source: $strSourceDir"
+
+
+# Check the source file exists
+if [ ! -d "$strSourceDir" ]
+then
+	echo "ERROR: Source file not found"
+	exit 1
+fi
+
+
+# Get list of MKV files in source dir
+arrFilesToProcess=($(find "$strSourceDir" -type f -iname '*.mkv'))
+
+# Check if there are any MKV files to process
+if [ ${#arrFilesToProcess[@]} -eq 0 ]
+then
+	echo "NOTICE: No MKV files to process"
+	
+	# Move source dir to the complete-postprocessed dir
+	echo "Moving Source Dir to the complete-postprocessed dir"
+	mv "$strSourceDir" "$strTargetDir"
+	
+	exit 0
+fi
+
+
+# Process the MKV files
+for strSourceFile in "${arrFilesToProcess[@]}"
+do :
+	echo "Processing MKV file: $strSourceFile"
+	
+	# Make new MKV file without the unwanted subtitltes
+	mkvmerge -o "$strSourceFile.MKVMERGETEMP" --subtitle-tracks $strRequiredSubtitleTracks --audio-tracks $strRequiredAudioTracks "$strSourceFile"
+
+	# Delete the source mkv file
+	echo "Deleting source file . . ."
+	rm "$strSourceFile"
+
+	# Rename the new mkv file to the name of the source mkv file
+	echo "Renaming new file to the same name as the original source file . . ."
+	mv "$strSourceFile.MKVMERGETEMP" "$strSourceFile"
+	
+	echo "--------------------------------------------------------------------"
+done
+
+# Move source dir to the complete-postprocessed dir
+echo "Moving Source Dir to the complete-postprocessed dir"
+mv "$strSourceDir" "$strTargetDir"
+
+
+
+### The End ##########################################################################################################
+
+
+exit 0
