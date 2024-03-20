@@ -8,13 +8,15 @@ Version        :  1.0
 
 Date           :  19/03/2024
 
+
 Requires:
-  qbittorrent-nox
-  mkvtoolnix-cli
-  mkvtoolnix-gui
+1. qbittorrent-nox
+2. mkvtoolnix-cli
+3. mkvtoolnix-gui
 
 Description:
-  This bash script uses mkvmerge to remove unwanted subtitles (SRT) from specifed mkv file. It then deletes the original mkv file and moves it to the specified target dir. This is intended to work with radarr and sonarr and qbittorrent
+
+This bash script uses mkvmerge to remove unwanted subtitles (SRT) from specifed mkv file. It then deletes the original mkv file and moves it to the specified target dir. This is intended to work with radarr and sonarr and qbittorrent
 
 Instructions:
 
