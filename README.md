@@ -31,6 +31,7 @@ Configure qbittorrent:
 2. In the qbittorrent web client goto Options > Downloads, then scroll down to the "Run external program" section
 3. Tick "Run external program on torrent finished"
 4. Enter the following in to the box below that tick box:
+
         /<path to the script>/qb-strip-srt "%R"
 
 Configure radarr and sonarr
