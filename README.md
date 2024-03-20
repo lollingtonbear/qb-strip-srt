@@ -1,8 +1,6 @@
 Script Name    :  qb-strip-srt
 
-Orginal Author :  Andy Sibthorp
-
-Latest Author  :  Andy Sibthorp
+Orginal Author :  Lollington_Bear
 
 Version        :  1.0
 
