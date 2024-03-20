@@ -1,7 +1,11 @@
 Script Name    :  qb-strip-srt
+
 Orginal Author :  Andy Sibthorp
+
 Latest Author  :  Andy Sibthorp
+
 Version        :  1.0
+
 Date           :  19/03/2024
 
 Requires:
