@@ -8,9 +8,11 @@ Date           :  19/03/2024
 
 Background:
 
-The Plex app my Samsung TV struggles to play mkv files if they containt a lot of language tracks for subtitles and audio. The player eaither locks up or the video playback is badly artifacted. To solve this you can use mkvmerge to create a new mkv file with only the tracks you want in it, then Plex app on the Samsung TV play the video without issue.
+The Plex app my Samsung TV struggles to play mkv files if they contain a lot of language tracks for subtitles and audio. The player either locks up or the video playback is badly artifacted. Apparantly this is a common issue with Samsung TV Plex app.
 
-I wanted to automate this process so it happens before radarr / sonarr pick up the file, and that is what this basic script does for you. I've also included the steps for it up.
+To solve this you can use mkvmerge to create a new mkv file with only the tracks you want in it, then Plex app on the Samsung TV play the video without issue.
+
+I wanted to automate this process so it happens before radarr / sonarr pick up the file, so I wrote a basic script that does it for you. I've also included the setup steps for it up.
 
 Requires:
 1. qbittorrent-nox
