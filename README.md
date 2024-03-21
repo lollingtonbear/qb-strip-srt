@@ -2,9 +2,9 @@ Script Name    :  qb-strip-srt
 
 Orginal Author :  Lollington_Bear
 
-Version        :  1.0
+Version        :  1.1
 
-Date           :  19/03/2024
+Date           :  21/03/2024
 
 Background:
 
