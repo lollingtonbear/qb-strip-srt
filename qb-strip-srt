@@ -3,9 +3,9 @@
 ### INFORMATION ######################################################################################################
 
 # Script Name    :  qb-strip-srt
-# Orginal Author :  Lollington_bear
-# Version        :  1.0
-# Date           :  19/03/2024
+# Orginal Author :  Lollington_Bear
+# Version        :  1.1
+# Date           :  21/03/2024
 
 # Dependencies:
 #   qbittorrent-nox
@@ -60,7 +60,7 @@ then
 	strTargetDir="/mnt/ssd-01/Torrents/complete-postprocessed/radarr"
 elif [[ $strSourceDir == *"tv-sonarr"* ]]
 then
-	strTargetDir="/mnt/ssd-01/Torrents/complete-postprocessed/sonarr"
+	strTargetDir="/mnt/ssd-01/Torrents/complete-postprocessed/tv-sonarr"
 else
 	strTargetDir="/mnt/ssd-01/Torrents/complete-postprocessed"
 fi
@@ -95,6 +95,7 @@ fi
 
 
 # Get list of MKV files in source dir
+IFS=""
 arrFilesToProcess=($(find "$strSourceDir" -type f -iname '*.mkv'))
 
 # Check if there are any MKV files to process
@@ -111,6 +112,7 @@ fi
 
 
 # Process the MKV files
+IFS=""
 for strSourceFile in "${arrFilesToProcess[@]}"
 do :
 	echo "Processing MKV file: $strSourceFile"
@@ -130,9 +132,8 @@ do :
 done
 
 # Move source dir to the complete-postprocessed dir
-echo "Moving Source Dir to the complete-postprocessed dir"
+echo "Moving Source Dir $strSourceDir - to Target Dir: $strTargetDir"
 mv "$strSourceDir" "$strTargetDir"
-
 
 
 ### The End ##########################################################################################################
