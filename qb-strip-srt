@@ -13,8 +13,9 @@
 #   mkvtoolnix-gui
 
 # Description:
-#   This bash script uses mkvmerge to remove unwanted subtitles (SRT) from specifed mkv file. It then deletes the original mkv file and moves it to the specified target dir.
-#   This designed to work with radarr and sonarr and qbittorrent
+#    The Plex app on my Samsung TV struggles to play mkv files if they contain a lot of language tracks for subtitles and audio. The player either locks up or the video playback is badly artefacting. Apparently this is a common issue with the Samsung TV Plex app.
+#    To solve this problem you can use mkvmerge to create a new mkv file containing only the tracks you want, then the Plex app on the Samsung TV plays the video without issue.
+#    I wanted to automate this process to happen before radarr / sonarr pick up the file, so I wrote a basic script that does it for you. I've also included the setup steps for it up.
 
 # Instructions:
 
