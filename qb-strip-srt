@@ -4,8 +4,8 @@
 
 # Script Name    :  qb-strip-srt
 # Orginal Author :  Lollington_Bear
-# Version        :  1.1
-# Date           :  21/03/2024
+# Version        :  1.3
+# Date           :  25/08/2024
 
 # Dependencies:
 #   qbittorrent-nox
@@ -52,7 +52,7 @@ strRequiredSubtitleTracks="und,eng"
 strRequiredAudioTracks="und,eng"
 
 # Specify Log file location and log file name
-strLogDir="/home/qbuser/qb-strip-srt-logs"
+strLogDir="/mnt/ssd-02/Logs/qb-strip-srt-logs"
 strLogFile="$strLogDir/qb-strip-srt $(date +"%y%m%d_%H%M%S").log"
 
 # Specify the target dir
@@ -87,57 +87,73 @@ exec > >(tee -a "$strLogFile") 2>&1
 echo "Source: $strSourceDir"
 
 
+
 # Check the source file exists
 if [ ! -d "$strSourceDir" ]
 then
-	echo "ERROR: Source file not found"
+	echo "ERROR: Source either not found or not specified"
 	exit 1
 fi
 
 
 # Get list of MKV files in source dir
-IFS=""
+IFS=$'\n'
 arrFilesToProcess=($(find "$strSourceDir" -type f -iname '*.mkv'))
 
 # Check if there are any MKV files to process
 if [ ${#arrFilesToProcess[@]} -eq 0 ]
 then
 	echo "NOTICE: No MKV files to process"
-	
+
 	# Move source dir to the complete-postprocessed dir
 	echo "Moving Source Dir to the complete-postprocessed dir"
 	mv "$strSourceDir" "$strTargetDir"
-	
+
 	exit 0
 fi
 
 
 # Process the MKV files
-IFS=""
-for strSourceFile in "${arrFilesToProcess[@]}"
-do :
-	echo "Processing MKV file: $strSourceFile"
-	
-	# Make new MKV file without the unwanted subtitltes
-	mkvmerge -o "$strSourceFile.MKVMERGETEMP" --subtitle-tracks $strRequiredSubtitleTracks --audio-tracks $strRequiredAudioTracks "$strSourceFile"
+if [ ${#arrFilesToProcess[@]} -gt 0 ]
+then
+    for strSourceFile in "${arrFilesToProcess[@]}"
+    do :
+        # Announce source filename and path
+        echo "Source file: $strSourceFile"
 
-	# Delete the source mkv file
-	echo "Deleting source file . . ."
-	rm "$strSourceFile"
+        if [ -f $strSourceFile ]
+        then
+            # Make new MKV file without the unwanted subtitltes
+            echo "Running mkvmerge to remove unwanted Audio and Subtitle tracks"
+            mkvmerge -o "$strSourceFile.MKVMERGETEMP" --subtitle-tracks $strRequiredSubtitleTracks --audio-tracks $strRequiredAudioTracks "$strSourceFile"
+            if [ $? -gt 0 ]
+            then
+                echo "ERROR: mkvmerge failed!"
+            fi
 
-	# Rename the new mkv file to the name of the source mkv file
-	echo "Renaming new file to the same name as the original source file . . ."
-	mv "$strSourceFile.MKVMERGETEMP" "$strSourceFile"
-	
-	echo "--------------------------------------------------------------------"
-done
+            # Delete the source mkv file
+            echo "Deleting source file"
+            rm "$strSourceFile"
 
-# Move source dir to the complete-postprocessed dir
-echo "Moving Source Dir $strSourceDir - to Target Dir: $strTargetDir"
-mv "$strSourceDir" "$strTargetDir"
+            # Rename the new mkv file to the name of the source mkv file
+            echo "Renaming new file to the same name as the original source file"
+            mv "$strSourceFile.MKVMERGETEMP" "$strSourceFile"
 
+            echo "--------------------------------------------------------------------"
+        else
+            # File not found don't run mkvmerge
+            echo "WARNING: Source File not found!"
+        fi
+
+    done
+
+    # Move source dir to the complete-postprocessed dir
+    echo "Moving Source Dir"
+    echo "From: $strSourceDir"
+    echo "To  : $strTargetDir"
+    mv "$strSourceDir" "$strTargetDir"
+fi
 
 ### The End ##########################################################################################################
-
 
 exit 0
